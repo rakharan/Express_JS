@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const passport = require('passport');
+const { authRegisterController } = require('../controllers/auth')
 const User = require('../database/schemas/User');
 const { hashPassword, comparePassword } = require('../utils/helpers')
 const router = Router();
@@ -25,18 +26,7 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
 })
 
 
-router.post('/register', async (req, res) => {
-    const { email } = req.body;
-    const userDB = await User.findOne({ email })
-    if (userDB) {
-        res.status(400).send({ message: "User already exist!" })
-    } else {
-        const password = hashPassword(req.body.password)
-        console.log(password)
-        const newUser = await User.create({ password, email });
-        res.send(201);
-    }
-})
+router.post('/register', authRegisterController)
 
 router.get('/discord', passport.authenticate('discord'), (req, res) => {
     res.send(200);
